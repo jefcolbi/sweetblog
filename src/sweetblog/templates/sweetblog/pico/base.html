@@ -1,0 +1,67 @@
+{% load static %}
+{% load i18n %}
+{% load meta %}
+{% get_current_language as lang %}
+<!DOCTYPE html>
+<html lang="en">
+<head {% meta_namespaces %}>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}SweetBlog{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.classless.min.css"
+    >
+    {% block extra_css %}{% endblock %}
+
+    {% include 'meta/meta.html' %}
+</head>
+<body>
+    <main class="container">
+        <header>
+            <nav>
+                <ul>
+                    <h2><strong><a href="{% url 'home' %}">{{ blog_name }}</a></strong></h2>
+                </ul>
+            </nav>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'collection_list' %}">{% translate 'Collections' %}</a></li>
+                </ul>
+                <ul>
+                    <li><a href="{% url 'tag_list' %}">{% translate 'Tags' %}</a></li>
+                </ul>
+                <ul>
+                    <li>
+                        <form method="get" action="{% url 'search' %}" style="margin: 0;">
+                            <input type="search" name="q" placeholder="{% translate 'Search...' %}" style="margin: 0; height: auto;" required>
+                        </form>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <div style="margin-top: 10vh;">
+            <div>
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+    
+    <footer style="margin-top: 4rem; padding: 2rem 0; border-top: 1px solid var(--muted-border-color);">
+        <div class="container">
+            <p style="text-align: center; margin: 0;">
+                {% if user.is_authenticated %}
+                    {% translate 'Logged in as' %} <strong>{{ user.username }}</strong> | 
+                    <a href="{% url 'sweetblog_profile' %}?next={{ request.path }}">{% translate 'Profile' %}</a>
+                {% else %}
+                    <a href="{% url 'sweetblog_connection' %}?next={{ request.path }}">{% translate 'Sign In' %}</a>
+                {% endif %}
+            </p>
+        </div>
+    </footer>
+    
+    <script src="{% static 'sweetblog/js/device-persistence.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

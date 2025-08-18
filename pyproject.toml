@@ -1,0 +1,31 @@
+[project]
+name = "sweetblog"
+version = "0.1.0"
+description = "Sweet blog package for Django"
+readme = "README.md"
+authors = [
+    { name = "Matt Jeff", email = "jefcolbi@gmail.com" }
+]
+requires-python = ">=3.8"
+dependencies = [
+    "crawlerdetect>=0.1.7",
+    "django>=3.2",
+    "django-autocomplete-light>=3.12.1",
+    "django-imagekit>=5.0.0",
+    "django-magic-notifier>=0.4.0",
+    "django-meta>=2.4.2",
+    "django-taggit>=6.1.0",
+    "django-treenode>=0.23.1",
+    "djangorestframework>=3.10",
+    "mistune>=3.1.3",
+    "pillow>=10.4.0",
+    "random-username>=1.0.2",
+    "unidecode>=1.4.0",
+]
+
+[project.scripts]
+sweetblog = "sweetblog:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

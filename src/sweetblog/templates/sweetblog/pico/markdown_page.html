@@ -1,0 +1,52 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}SweetBlog{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.classless.min.css"
+    >
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <main class="container">
+        <header>
+            <nav>
+                <ul>
+                    <h2><strong><a href="{% url 'home' %}">{{ blog_name }}</a></strong></h2>
+                </ul>
+            </nav>
+            {% if page.show_site_nav %}
+            <nav>
+                <ul>
+                    <li><a href="{% url 'collection_list' %}">{% translate 'Collections' %}</a></li>
+                </ul>
+                <ul>
+                    <li><a href="{% url 'tag_list' %}">{% translate 'Tags' %}</a></li>
+                </ul>
+                <ul>
+                    <li>
+                        <form method="get" action="{% url 'search' %}" style="margin: 0;">
+                            <input type="search" name="q" placeholder="{% translate 'Search...' %}" style="margin: 0; height: auto;" required>
+                        </form>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+        </header>
+    
+        {% if page.show_page_title %}
+        <h1>{{ page.title }}</h1>
+        {% endif %}
+
+        <div style="margin-top: 10vh;">
+            {{ page.generated_html|safe }}
+        </div>
+    </main>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

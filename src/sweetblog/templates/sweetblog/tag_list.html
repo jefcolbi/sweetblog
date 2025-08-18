@@ -1,0 +1,36 @@
+{% extends base_template %}
+
+{% block title %}Tags - {{ blog_name }}{% endblock %}
+
+{% block content %}
+<h2 style="margin-top: 10vh;">Tags</h2>
+    
+<hr style="margin-bottom: 10vh;" />
+
+<div class="tags-grid">
+    {% for tag in tags %}
+    <article class="tag-card">
+        <h4><a href="{% url 'tag_detail' slug=tag.slug %}">{{ tag.name }}</a></h4>
+        <p>
+            <small>{{ tag.article_count }} article{{ tag.article_count|pluralize }}</small>
+        </p>
+    </article>
+    {% empty %}
+    <p>No tags yet.</p>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">← Previous</a>
+    {% endif %}
+    
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends base_template %}
+{% load i18n %}
+
+{% block title %}{{ blog_name }} - {% translate 'Sign In' %}{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h1>{% translate 'Sign In' %}</h1>
+    <p>{% translate 'Enter your email address to sign in or create an account' %}</p>
+    
+    <form method="post" action="{% url 'sweetblog_connection' %}?next={{ next }}">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="error-message">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            {{ form.email }}
+            {% if form.email.help_text %}
+                <small>{{ form.email.help_text }}</small>
+            {% endif %}
+            {% if form.email.errors %}
+                <small class="error">{{ form.email.errors.0 }}</small>
+            {% endif %}
+        </div>
+        
+        <button type="submit">{% translate 'Continue' %}</button>
+    </form>
+</div>
+
+<style>
+.auth-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 2em;
+}
+.form-group {
+    margin-bottom: 1.5em;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 0.5em;
+}
+.form-group input {
+    width: 100%;
+}
+.error-message, .error {
+    color: #d32f2f;
+}
+</style>
+{% endblock %}

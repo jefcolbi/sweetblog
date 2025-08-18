@@ -1,0 +1,46 @@
+{% extends base_template %}
+
+{% block title %}Collections - SweetBlog{% endblock %}
+
+{% block content %}
+<h2 style="margin-top: 10vh;">Collections</h2>
+    
+<hr style="margin-bottom: 10vh;" />
+
+{% for collection in collections %}
+<article class="collection-card">
+    <header style="display: flex; align-items: flex-start; justify-content: space-between;">
+        <div style="display: flex; align-items: flex-start;">
+            <img src="{{ collection.thumbnail.url }}" alt="{{ collection.title }}"
+             style="margin-right: 10px; width: 10vw;">
+
+            <h2 style="display: inline-block;"><a href="{{ collection.get_url }}">{{ collection.name }}</a></h2>
+        </div>
+    </header>
+    
+    {% if collection.description %}
+    <p>{{ collection.description|truncatewords:30 }}</p>
+    {% endif %}
+    
+    <p>
+        <small>{{ collection.articles.count }} article{{ collection.articles.count|pluralize }}</small>
+    </p>
+</article>
+{% empty %}
+<p>No collections yet.</p>
+{% endfor %}
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">← Previous</a>
+    {% endif %}
+    
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

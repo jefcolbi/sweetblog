@@ -1,0 +1,48 @@
+{% extends base_template %}
+{% load i18n %}
+
+{% block title %}{{ blog_name }} - {% translate 'Verify Code' %}{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h1>{% translate 'Verify Your Email' %}</h1>
+        <p>{% translate 'We have sent a verification code to your email address. Please enter it below.' %}</p>
+    </header>
+    
+    <form method="post" action="{% url 'sweetblog_code' %}?next={{ next }}&email={{ email }}">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div role="alert">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        <label for="{{ form.email.id_for_label }}">
+            {{ form.email.label }}
+            {{ form.email }}
+        </label>
+        
+        <label for="{{ form.code.id_for_label }}">
+            {{ form.code.label }}
+            {{ form.code }}
+            {% if form.code.help_text %}
+                <small>{{ form.code.help_text }}</small>
+            {% endif %}
+            {% if form.code.errors %}
+                <small style="color: var(--form-element-invalid-border-color);">{{ form.code.errors.0 }}</small>
+            {% endif %}
+        </label>
+        
+        <button type="submit">{% translate 'Verify' %}</button>
+        
+        <p>
+            <small>
+                {% translate "Didn't receive the code?" %} 
+                <a href="{% url 'sweetblog_connection' %}?next={{ next }}">{% translate 'Try again' %}</a>
+            </small>
+        </p>
+    </form>
+</article>
+{% endblock %}

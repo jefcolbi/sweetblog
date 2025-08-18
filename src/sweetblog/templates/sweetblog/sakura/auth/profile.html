@@ -1,0 +1,79 @@
+{% extends base_template %}
+{% load i18n %}
+
+{% block title %}{{ blog_name }} - {% translate 'Profile' %}{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h1>{% translate 'Your Profile' %}</h1>
+    <p>{% translate 'Update your profile information' %}</p>
+    
+    <form method="post" action="{% url 'sweetblog_profile' %}?next={{ next }}">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="error-message">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            {{ form.email }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+            {{ form.username }}
+            {% if form.username.help_text %}
+                <small>{{ form.username.help_text }}</small>
+            {% endif %}
+            {% if form.username.errors %}
+                <small class="error">{{ form.username.errors.0 }}</small>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>
+                {{ form.receive_newsletter }}
+                {{ form.receive_newsletter.label }}
+            </label>
+            {% if form.receive_newsletter.help_text %}
+                <small>{{ form.receive_newsletter.help_text }}</small>
+            {% endif %}
+        </div>
+        
+        <button type="submit">{% translate 'Save Changes' %}</button>
+        
+        {% if next %}
+            <a href="{{ next }}" class="button-secondary">{% translate 'Cancel' %}</a>
+        {% endif %}
+    </form>
+</div>
+
+<style>
+.auth-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 2em;
+}
+.form-group {
+    margin-bottom: 1.5em;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 0.5em;
+}
+.form-group input[type="text"],
+.form-group input[type="email"] {
+    width: 100%;
+}
+.error-message, .error {
+    color: #d32f2f;
+}
+.button-secondary {
+    margin-left: 1em;
+    color: #666;
+}
+</style>
+{% endblock %}

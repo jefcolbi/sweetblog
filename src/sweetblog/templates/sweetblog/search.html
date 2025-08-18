@@ -1,0 +1,58 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <h1>Search Results</h1>
+    
+    {% if query %}
+        <p>Search results for: <strong>"{{ query }}"</strong></p>
+        
+        {% if results %}
+            <div class="search-results">
+                {% for result in results %}
+                    <div class="search-result">
+                        <h3>
+                            [{{ result.type|title }}] <a href="{{ result.url }}">{{ result.title }}</a>
+                            
+                        </h3>
+                        <p>{{ result.description }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            {% if is_paginated %}
+                <nav class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?q={{ query }}&page=1">« First</a>
+                        <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">‹ Previous</a>
+                    {% endif %}
+                    
+                    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next ›</a>
+                        <a href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}">Last »</a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+        {% else %}
+            <p>No results found for your search query.</p>
+        {% endif %}
+    {% else %}
+        <p>Please enter a search query.</p>
+    {% endif %}
+    
+    <hr>
+    
+    <form method="get" action="{% url 'search' %}">
+        <input type="search" name="q" placeholder="Search again..." value="{{ query }}" required>
+        <button type="submit">Search</button>
+    </form>
+
+</div>
+
+
+{% endblock %}

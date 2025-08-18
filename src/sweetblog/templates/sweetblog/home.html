@@ -1,0 +1,50 @@
+{% extends base_template %}
+{% load i18n %}
+
+{% block title %}{% translate 'Home' %} - {{ blog_name }}{% endblock %}
+
+{% block content %}
+<h1 style="margin-top: 10vh;">{% translate 'Home' %}</h1>
+    
+<hr style="margin-bottom: 10vh;" />
+
+{% for article in articles %}
+<article style="margin-bottom: 5vh;">
+    <header style="display: flex; align-items: flex-start; justify-content: space-between;">
+        <div style="display: flex; align-items: flex-start;">
+            <img src="{{ article.thumbnail.url }}" alt="{{ article.title }}"
+                 style="margin-right: 10px; width: 10vw;">
+            <h2><a href="{{ article.get_url }}">{{ article.title }}</a></h2>
+        </div>
+    </header>
+
+    <p>{{ article.description|truncatewords:30 }}</p>
+
+    <footer>
+        <small>
+            By {{ article.created_by.get_full_name|default:article.created_by.username }}
+            on {{ article.created_at|date:"F d, Y" }}
+            {% if article.collection %}
+            in <a href="{{ article.collection.get_url }}">{{ article.collection.name }}</a>
+            {% endif %}
+        </small>
+    </footer>
+</article>
+{% empty %}
+<p>No articles yet.</p>
+{% endfor %}
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">← Previous</a>
+    {% endif %}
+    
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

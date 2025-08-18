@@ -1,0 +1,54 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}SweetBlog{% endblock %}</title>
+    
+    {% block main_css %}
+    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" media="screen and (prefers-color-scheme: dark)" />
+    {% endblock %}
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav>
+                <h2><a href="{% url 'home' %}" style="text-decoration: none;">{{ blog_name }}</a></h2>
+                <ul>
+                    <li style="display: inline; margin-right: 20px;"><a href="{% url 'collection_list' %}">{% translate 'Collections' %}</a></li>
+                    <li style="display: inline; margin-right: 20px;"><a href="{% url 'tag_list' %}">{% translate 'Tags' %}</a></li>
+                    <li style="display: inline;">
+                        <form method="get" action="{% url 'search' %}" style="display: inline;">
+                            <input type="search" name="q" placeholder="{% translate 'Search...' %}" style="width: 200px;" required>
+                            <button type="submit">{% translate 'Search' %}</button>
+                        </form>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="layout">
+            
+            <main class="main-content">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    
+    <footer style="margin-top: 4rem; padding: 2rem 0; border-top: 1px solid #ddd; text-align: center;">
+        {% if user.is_authenticated %}
+            {% translate 'Logged in as' %} <strong>{{ user.username }}</strong> | 
+            <a href="{% url 'sweetblog_profile' %}?next={{ request.path }}">{% translate 'Profile' %}</a>
+        {% else %}
+            <a href="{% url 'sweetblog_connection' %}?next={{ request.path }}">{% translate 'Sign In' %}</a>
+        {% endif %}
+    </footer>
+    
+    <script src="{% static 'sweetblog/js/persistent-session.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

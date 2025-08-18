@@ -1,0 +1,55 @@
+{{ blog_name }} Newsletter
+========================
+{{ newsletter_date|date:"F d, Y" }}
+
+Hello {{ user.first_name|default:user.username }}!
+
+Welcome to your {{ blog_name }} newsletter. Here are the latest updates and articles from our blog.
+
+{% if newsletter_content %}
+{{ newsletter_content|striptags }}
+
+{% endif %}
+{% if articles %}
+LATEST ARTICLES
+===============
+
+{% for article in articles %}
+{{ article.title }}
+{% if article.created_by %}By {{ article.created_by.get_full_name|default:article.created_by.username }} • {% endif %}{{ article.created_at|date:"F d, Y" }}
+
+{{ article.description|truncatewords:30 }}
+
+Read more: {{ article.get_url }}
+
+---
+
+{% endfor %}
+{% endif %}
+{% if collections %}
+FEATURED COLLECTIONS
+====================
+
+{% for collection in collections %}
+{{ collection.name }}
+
+{{ collection.description|truncatewords:25 }}
+
+Explore: {{ collection.get_url }}
+
+---
+
+{% endfor %}
+{% endif %}
+
+NEWSLETTER PREFERENCES
+======================
+
+You're receiving this newsletter because you subscribed to {{ blog_name }} updates.
+{% if unsubscribe_url %}
+To unsubscribe: {{ unsubscribe_url }}
+{% endif %}
+
+---
+© {{ current_year }} {{ blog_name }}. All rights reserved.
+{{ blog_author|default:"The Blog Team" }}

@@ -1,0 +1,20 @@
+{% extends base_template %}
+
+{% block title %}{{ page.title }} - {{ blog_name }}{% endblock %}
+
+{% block content %}
+<article style="margin-top: 10vh;">
+    <header>
+        <h1>{{ page.title }}</h1>
+        <p>
+            <small>
+                Last updated on {{ page.updated_at|date:"F d, Y" }}
+            </small>
+        </p>
+    </header>
+    
+    <div class="page-content" style="margin-top: 50px;">
+        {{ page.generated_html|safe }}
+    </div>
+</article>
+{% endblock %}
