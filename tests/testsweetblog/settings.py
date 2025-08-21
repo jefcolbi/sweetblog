@@ -135,7 +135,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-CSS_FRAMEWORK = 'pico'
+CSS_FRAMEWORK = 'sakura'
 CSS_FRAMEWORK_THEME = ''
 
 BLOG_NAME = "Jefcolbi's Blog"

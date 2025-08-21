@@ -1,5 +1,6 @@
 {% extends base_template %}
 {% load i18n %}
+{% load static %}
 
 {% block title %}{{ article.title }} - SweetBlog{% endblock %}
 
@@ -32,14 +33,14 @@
     
     <!-- Like/Dislike buttons -->
     <div style="margin: 2rem 0; display: flex; gap: 1rem; align-items: center;">
-        <button id="like-btn" class="like-dislike-btn" data-action="like" style="background: none; border: 1px solid #ccc; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+        <button id="like-btn" class="like-dislike-btn" data-action="like" style="background: grey; border: 1px solid #ccc; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="{% if liked %}gold{% else %}none{% endif %}" stroke="{% if liked %}gold{% else %}currentColor{% endif %}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
             </svg>
             <span>{{ like_count }} Likes</span>
         </button>
         
-        <button id="dislike-btn" class="like-dislike-btn" data-action="dislike" style="background: none; border: 1px solid #ccc; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+        <button id="dislike-btn" class="like-dislike-btn" data-action="dislike" style="background: grey; border: 1px solid #ccc; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="{% if disliked %}red{% else %}none{% endif %}" stroke="{% if disliked %}red{% else %}currentColor{% endif %}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
             </svg>
@@ -132,7 +133,7 @@
             <!-- Second level comment: reply to parent (becomes sibling) -->
             <button class="reply-btn"
                     onclick="showReplyForm({{ comment.node.id }}, {{ comment.node.id }})"
-                    style="font-size: 0.9rem; padding: 0.25rem 0.75rem; background: none; border: 1px solid #ccc; border-radius: 3px; cursor: pointer;">
+                    style="font-size: 0.9rem; padding: 0.25rem 0.75rem; background: orange; border: 1px solid #ccc; border-radius: 3px; cursor: pointer;">
                 Reply
             </button>
         </div>
@@ -147,472 +148,43 @@
     <h2>More from {{ article.collection.name }}</h2>
     <div class="grid">
         {% for related in related_articles %}
-        <article>
-            {% if related.thumbnail %}
-            <img src="{{ related.thumbnail.url }}" alt="{{ related.title }}" style="width: 100%; height: 150px; object-fit: cover;">
-            {% endif %}
-            <h3><a href="{{ related.get_url }}">{{ related.title }}</a></h3>
-            <p>{{ related.description|truncatewords:15 }}</p>
+        <article style="margin-bottom: 5vh;">
+            <header style="display: flex; align-items: flex-start; justify-content: space-between;">
+                <div style="display: flex; align-items: flex-start;">
+                    <img src="{{ related.thumbnail.url }}" alt="{{ related.title }}"
+                         style="margin-right: 10px; width: 10vw;">
+                    <h2><a href="{{ related.get_url }}">{{ related.title }}</a></h2>
+                </div>
+            </header>
+        
+            <p>{{ related.description|truncatewords:30 }}</p>
+        
+            <footer>
+                <small>
+                    By {{ related.created_by.get_full_name|default:related.created_by.username }}
+                    on {{ related.created_at|date:"F d, Y" }}
+                    {% if related.collection %}
+                    in <a href="{{ related.collection.get_url }}">{{ related.collection.name }}</a>
+                    {% endif %}
+                </small>
+            </footer>
         </article>
         {% endfor %}
     </div>
 </section>
 {% endif %}
 
+{% endblock %}
+
+{% block extra_js %}
 <script>
-(function() {
-    const articleId = {{ article.id }};
-    const articleType = 'markdownarticle';
-    const csrfToken = '{{ csrf_token }}';
-    
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    
-    // Like/Dislike functionality
-    const likeBtn = document.getElementById('like-btn');
-    const dislikeBtn = document.getElementById('dislike-btn');
-    
-    function updateButtonStyles(liked, disliked, likeCount, dislikeCount) {
-        const likeSvg = likeBtn.querySelector('svg');
-        const dislikeSvg = dislikeBtn.querySelector('svg');
-        const likeCountSpan = document.getElementById('like-count');
-        const dislikeCountSpan = document.getElementById('dislike-count');
-        
-        if (liked) {
-            likeSvg.setAttribute('fill', 'gold');
-            likeSvg.setAttribute('stroke', 'gold');
-        } else {
-            likeSvg.setAttribute('fill', 'none');
-            likeSvg.setAttribute('stroke', 'currentColor');
-        }
-        
-        if (disliked) {
-            dislikeSvg.setAttribute('fill', 'red');
-            dislikeSvg.setAttribute('stroke', 'red');
-        } else {
-            dislikeSvg.setAttribute('fill', 'none');
-            dislikeSvg.setAttribute('stroke', 'currentColor');
-        }
-        
-        // Update counts if provided
-        if (likeCount !== undefined) {
-            likeCountSpan.textContent = '(' + likeCount + ')';
-        }
-        if (dislikeCount !== undefined) {
-            dislikeCountSpan.textContent = '(' + dislikeCount + ')';
-        }
-    }
-    
-    function handleLikeDislike(action) {
-        fetch("{% url 'like_dislike' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                article_id: articleId,
-                article_type: articleType,
-                action: action
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                updateButtonStyles(data.liked, data.disliked, data.like_count, data.dislike_count);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
-    
-    likeBtn.addEventListener('click', function() {
-        handleLikeDislike('like');
-    });
-    
-    dislikeBtn.addEventListener('click', function() {
-        handleLikeDislike('dislike');
-    });
-    
-    // Mark as read functionality
-    let hasMarkedAsRead = false;
-    
-    function markArticleAsRead() {
-        if (hasMarkedAsRead) return;
-        
-        hasMarkedAsRead = true;
-        
-        fetch("{% url 'mark_as_read' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                article_id: articleId,
-                article_type: articleType
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Article marked as read');
-            }
-        })
-        .catch(error => {
-            console.error('Error marking article as read:', error);
-        });
-    }
-    
-    function checkVisibility() {
-        const footer = document.querySelector('article > footer');
-        if (!footer) return;
-        
-        const rect = footer.getBoundingClientRect();
-        const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
-        
-        // Check if footer is visible in viewport
-        if (rect.top < viewHeight && rect.bottom > 0) {
-            markArticleAsRead();
-            // Remove event listeners once marked as read
-            window.removeEventListener('scroll', checkVisibility);
-            window.removeEventListener('resize', checkVisibility);
-        }
-    }
-    
-    // Check visibility on scroll and resize
-    window.addEventListener('scroll', checkVisibility);
-    window.addEventListener('resize', checkVisibility);
-    
-    // Check initial visibility
-    window.addEventListener('load', checkVisibility);
-    
-    // Also check after a short delay to handle dynamic content loading
-    setTimeout(checkVisibility, 1000);
-    
-    // Comment system functions
-    /**
-     * Submit a new top-level comment
-     */
-    window.submitComment = function() {
-        const content = document.getElementById('main-comment-content').value.trim();
-        
-        if (!content) {
-            alert('Please write a comment before submitting.');
-            return;
-        }
-        
-        // Disable the form while submitting
-        const textarea = document.getElementById('main-comment-content');
-        const button = textarea.nextElementSibling;
-        textarea.disabled = true;
-        button.disabled = true;
-        button.textContent = 'Posting...';
-        
-        // Send comment to server
-        fetch("{% url 'submit_comment' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                article_id: articleId,
-                article_type: articleType,
-                content: content
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Clear the form
-                textarea.value = '';
-                
-                // Add the new comment to the page
-                addCommentToPage(data.comment);
-                
-                // Update comment count
-                updateCommentCount(1);
-            } else {
-                alert('Error: ' + (data.error || 'Failed to post comment'));
-            }
-        })
-        .catch(error => {
-            console.error('Error posting comment:', error);
-            alert('Failed to post comment. Please try again.');
-        })
-        .finally(() => {
-            // Re-enable the form
-            textarea.disabled = false;
-            button.disabled = false;
-            button.textContent = 'Post Comment';
-        });
-    };
-    
-    /**
-     * Show reply form for a specific comment
-     */
-    window.showReplyForm = function(formId, targetParentId) {
-        // Hide all other reply forms
-        document.querySelectorAll('[id^="reply-form-"]').forEach(form => {
-            form.style.display = 'none';
-        });
-        
-        // Show this reply form
-        const replyForm = document.getElementById('reply-form-' + formId);
-        if (replyForm) {
-            replyForm.style.display = 'block';
-            const textarea = document.getElementById('reply-content-' + formId);
-            if (textarea) {
-                textarea.focus();
-            }
-        }
-        
-        // Store the target parent ID for submission
-        window.currentReplyTarget = targetParentId;
-        window.currentReplyForm = formId;
-    };
-    
-    /**
-     * Hide reply form for a specific comment
-     */
-    window.hideReplyForm = function(commentId) {
-        const replyForm = document.getElementById('reply-form-' + commentId);
-        if (replyForm) {
-            replyForm.style.display = 'none';
-            const textarea = document.getElementById('reply-content-' + commentId);
-            if (textarea) {
-                textarea.value = '';
-            }
-        }
-    };
-    
-    /**
-     * Submit a reply to an existing comment
-     */
-    window.submitReply = function(formId) {
-        const content = document.getElementById('reply-content-' + formId).value.trim();
-        const targetParentId = window.currentReplyTarget || formId;
-        
-        if (!content) {
-            alert('Please write a reply before submitting.');
-            return;
-        }
-        
-        // Disable the form while submitting
-        const textarea = document.getElementById('reply-content-' + formId);
-        const buttons = textarea.nextElementSibling.querySelectorAll('button');
-        textarea.disabled = true;
-        buttons[0].disabled = true;
-        buttons[0].textContent = 'Posting...';
-        buttons[1].disabled = true;
-        
-        // Send reply to server
-        fetch("{% url 'submit_comment' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                article_id: articleId,
-                article_type: articleType,
-                content: content,
-                parent_id: targetParentId
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Hide the reply form
-                hideReplyForm(formId);
-                
-                // Add the new reply to the page
-                addReplyToPage(data.comment, targetParentId);
-                
-                // Update comment count
-                updateCommentCount(1);
-            } else {
-                alert('Error: ' + (data.error || 'Failed to post reply'));
-            }
-        })
-        .catch(error => {
-            console.error('Error posting reply:', error);
-            alert('Failed to post reply. Please try again.');
-        })
-        .finally(() => {
-            // Re-enable the form
-            textarea.disabled = false;
-            buttons[0].disabled = false;
-            buttons[0].textContent = 'Post Reply';
-            buttons[1].disabled = false;
-        });
-    };
-    
-    /**
-     * Add a new comment to the page
-     */
-    function addCommentToPage(comment) {
-        const container = document.getElementById('comments-container');
-        
-        // Remove "no comments" message if it exists
-        const noComments = container.querySelector('p');
-        if (noComments && noComments.textContent.includes('No comments yet')) {
-            noComments.remove();
-        }
-        
-        // Create comment HTML
-        const commentDiv = document.createElement('div');
-        commentDiv.className = 'comment';
-        commentDiv.dataset.commentId = comment.id;
-        commentDiv.dataset.level = comment.level || 0;
-        commentDiv.style.marginLeft = ((comment.level || 0) * 2) + 'rem';
-        commentDiv.style.marginBottom = '1rem';
-        commentDiv.style.padding = '1rem';
-        commentDiv.style.borderLeft = '2px solid #e0e0e0';
-        
-        commentDiv.innerHTML = `
-            <div style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">
-                <strong>${comment.username}</strong> • 
-                <span>${comment.created_at}</span>
-            </div>
-            <div style="margin-bottom: 0.5rem; line-height: 1.5;">
-                ${comment.content.replace(/\n/g, '<br>')}
-            </div>
-            <button class="reply-btn" 
-                    onclick="showReplyForm(${comment.id})" 
-                    style="font-size: 0.9rem; padding: 0.25rem 0.75rem; background: none; border: 1px solid #ccc; border-radius: 3px; cursor: pointer;">
-                Reply
-            </button>
-            <div id="reply-form-${comment.id}" style="display: none; margin-top: 1rem;">
-                <textarea id="reply-content-${comment.id}" 
-                          placeholder="Write a reply..." 
-                          style="width: 100%; min-height: 80px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 5px; resize: vertical;"></textarea>
-                <div style="margin-top: 0.5rem;">
-                    <button onclick="submitReply(${comment.id})" 
-                            style="padding: 0.25rem 0.75rem; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; margin-right: 0.5rem;">
-                        Post Reply
-                    </button>
-                    <button onclick="hideReplyForm(${comment.id})" 
-                            style="padding: 0.25rem 0.75rem; background: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        // Add to container at the beginning (newest first) or end (oldest first)
-        container.insertBefore(commentDiv, container.firstChild);
-    }
-    
-    /**
-     * Add a reply to an existing comment (Facebook-style threading)
-     */
-    function addReplyToPage(reply, parentId) {
-        const parentComment = document.querySelector(`[data-comment-id="${parentId}"]`);
-        
-        if (parentComment) {
-            // Create reply HTML
-            const replyDiv = document.createElement('div');
-            replyDiv.className = 'comment';
-            replyDiv.dataset.commentId = reply.id;
-            replyDiv.dataset.level = reply.level || 1;
-            replyDiv.style.marginLeft = ((reply.level || 1) * 2) + 'rem';
-            replyDiv.style.marginBottom = '1rem';
-            replyDiv.style.marginTop = '1rem';
-            replyDiv.style.padding = '1rem';
-            replyDiv.style.borderLeft = '2px solid #e0e0e0';
-            
-            // For Facebook-style threading, only show reply button on first-level comments
-            const replyButton = reply.level === 0 ? `
-                <button class="reply-btn" 
-                        onclick="showReplyForm(${reply.id})" 
-                        style="font-size: 0.9rem; padding: 0.25rem 0.75rem; background: none; border: 1px solid #ccc; border-radius: 3px; cursor: pointer;">
-                    Reply
-                </button>
-                <div id="reply-form-${reply.id}" style="display: none; margin-top: 1rem;">
-                    <textarea id="reply-content-${reply.id}" 
-                              placeholder="Write a reply..." 
-                              style="width: 100%; min-height: 80px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 5px; resize: vertical;"></textarea>
-                    <div style="margin-top: 0.5rem;">
-                        <button onclick="submitReply(${reply.id})" 
-                                style="padding: 0.25rem 0.75rem; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; margin-right: 0.5rem;">
-                            Post Reply
-                        </button>
-                        <button onclick="hideReplyForm(${reply.id})" 
-                                style="padding: 0.25rem 0.75rem; background: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">
-                            Cancel
-                        </button>
-                    </div>
-                </div>` : '';
-            
-            replyDiv.innerHTML = `
-                <div style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">
-                    <strong>${reply.username}</strong> • 
-                    <span>${reply.created_at}</span>
-                </div>
-                <div style="margin-bottom: 0.5rem; line-height: 1.5;">
-                    ${reply.content.replace(/\n/g, '<br>')}
-                </div>
-                ${replyButton}
-            `;
-            
-            // Facebook-style insertion: find the appropriate position
-            // For first-level comments, insert after parent
-            // For second-level comments, insert after the last reply to the thread
-            if (reply.level === 0) {
-                // This is a first-level comment, insert after parent
-                parentComment.parentNode.insertBefore(replyDiv, parentComment.nextSibling);
-            } else {
-                // This is a second-level comment, find the last reply in this thread
-                const firstLevelParent = document.querySelector(`[data-comment-id="${parentId}"]`);
-                let insertAfter = firstLevelParent;
-                let nextSibling = firstLevelParent.nextElementSibling;
-                
-                // Find the last reply to this first-level comment
-                while (nextSibling && nextSibling.classList.contains('comment')) {
-                    const nextLevel = parseInt(nextSibling.dataset.level);
-                    if (nextLevel > 0) {
-                        insertAfter = nextSibling;
-                        nextSibling = nextSibling.nextElementSibling;
-                    } else {
-                        break; // Found another first-level comment
-                    }
-                }
-                
-                // Insert after the last reply
-                insertAfter.parentNode.insertBefore(replyDiv, insertAfter.nextSibling);
-            }
-        }
-    }
-    
-    /**
-     * Update the comment count display
-     */
-    function updateCommentCount(increment) {
-        const h2 = document.querySelector('section h2');
-        if (h2 && h2.textContent.includes('Comments')) {
-            const match = h2.textContent.match(/\((\d+)\)/);
-            if (match) {
-                const currentCount = parseInt(match[1]);
-                const newCount = currentCount + increment;
-                h2.textContent = `Comments (${newCount})`;
-            }
-        }
-    }
-})();
+    // Pass Django variables to JavaScript
+    window.articleId = {{ article.id }};
+    window.articleType = 'markdownarticle';
+    window.csrfToken = '{{ csrf_token }}';
+    window.likeDislikeUrl = "{% url 'like_dislike' %}";
+    window.markAsReadUrl = "{% url 'mark_as_read' %}";
+    window.submitCommentUrl = "{% url 'submit_comment' %}";
 </script>
+<script src="{% static 'sweetblog/js/article.js' %}"></script>
 {% endblock %}
