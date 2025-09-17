@@ -216,7 +216,10 @@ class ArticleDetailView(BlogSettingsMixin, DetailView):
             ))
         )
         avg_read_duration: timedelta = average_duration_minutes['avg_duration_minutes']
-        context['avg_read_duration'] = round(avg_read_duration.total_seconds() / 60)
+        if avg_read_duration:
+            context['avg_read_duration'] = round(avg_read_duration.total_seconds() / 60)
+        else:
+            context['avg_read_duration'] = 0
         
         return context
 
@@ -847,6 +850,9 @@ class CommentView(TemplateView):
         from django.http import JsonResponse
         from django.contrib.contenttypes.models import ContentType
         import json
+
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Not logged in'}, status=401)
         
         try:
             # Parse request data

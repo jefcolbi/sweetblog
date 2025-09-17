@@ -247,7 +247,6 @@ class Command(BaseCommand):
                 description=fake.paragraph(nb_sentences=2),
                 content=content,
                 status=random.choice(statuses),
-                writer=user,
                 created_by=user,
                 updated_by=user,
                 version="1.0",

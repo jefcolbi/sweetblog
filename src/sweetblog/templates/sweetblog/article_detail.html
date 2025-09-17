@@ -64,6 +64,7 @@
     <h2>Comments ({{ comment_count }})</h2>
     
     <!-- Main comment form for top-level comments -->
+    {% if user.is_authenticated %}
     <div id="main-comment-form" style="margin: 1.5rem 0;">
         {% csrf_token %}
         <textarea id="main-comment-content" 
@@ -74,6 +75,9 @@
             Post Comment
         </button>
     </div>
+    {% else %}
+    <div>-- {% translate 'Signin to comment' %} --</div>
+    {% endif %}
     
     <!-- Comments list -->
     <div id="comments-container" style="margin-top: 2rem;">
@@ -131,11 +135,13 @@
             </div>
 
             <!-- Second level comment: reply to parent (becomes sibling) -->
+            {% if user.is_authenticated %}
             <button class="reply-btn"
                     onclick="showReplyForm({{ comment.node.id }}, {{ comment.node.id }})"
                     style="font-size: 0.9rem; padding: 0.25rem 0.75rem; background: orange; border: 1px solid #ccc; border-radius: 3px; cursor: pointer;">
                 Reply
             </button>
+            {% endif %}
         </div>
         {% empty %}
         <p style="color: #666; font-style: italic;">No comments yet. Be the first to comment!</p>
