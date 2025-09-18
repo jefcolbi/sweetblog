@@ -151,7 +151,7 @@ class AbstractArticle(ModelMeta, TrackingMixin, models.Model):
 
     title = models.CharField(max_length=255)
     keywords = models.CharField(max_length=255, help_text=_("Enter SEO keywords"))
-    tags = TaggableManager(through=TaggedWhatever)
+    tags = TaggableManager(through=TaggedWhatever, )
     image = ProcessedImageField(upload_to='articles', processors=[ResizeToFit(1024, upscale=False)], format='JPEG',
                                 options={'quality': 90})
     thumbnail = ProcessedImageField(upload_to='thumbnails', processors=[ResizeToFit(300, upscale=False)], format='JPEG',
@@ -197,7 +197,7 @@ class AbstractArticle(ModelMeta, TrackingMixin, models.Model):
 
     def save(self, **kwargs):
         self.generated_html = self.generate_html()
-        super().save(**kwargs)
+        return super().save(**kwargs)
 
 
 class MarkdownArticle(AbstractArticle):

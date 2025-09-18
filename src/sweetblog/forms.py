@@ -1,6 +1,11 @@
+from io import BytesIO
+
 from django import forms
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.forms import ModelForm
 from django.contrib.auth import get_user_model
+from imagekit.templatetags.imagekit import thumbnail
+
 from .models import MarkdownArticle, SweetblogProfile, MarkdownPage
 from .widgets import MarkdownWidget
 from dal_select2_taggit.widgets import TaggitSelect2
@@ -43,7 +48,7 @@ class MarkdownArticleForm(ModelForm):
                 attrs={
                     'data-minimum-input-length': 3,
                 }
-            )
+            ),
         }
         labels = {
             'title': 'Title',
@@ -65,9 +70,21 @@ class MarkdownArticleForm(ModelForm):
         }
 
     def save(self, commit=True):
+        thumbnail = None
+
         if 'image' in self.cleaned_data:
-            self.cleaned_data['thumbnail'] = self.cleaned_data['image']
-        return super().save(commit=commit)
+            original_image: InMemoryUploadedFile = self.cleaned_data['image']
+            content = BytesIO(original_image.read())
+            thumbnail = InMemoryUploadedFile(file=content, field_name='thumbnail',
+                                             name=original_image.name, content_type=original_image.content_type,
+                                             size=original_image.size, charset=original_image.charset)
+            original_image.seek(0)
+
+        res = super().save(commit=commit)
+        if thumbnail:
+            res.thumbnail = thumbnail
+            res.save()
+        return
 
 
 class EmailForm(forms.Form):

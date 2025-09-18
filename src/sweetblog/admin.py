@@ -39,7 +39,7 @@ class CollectionAdmin(admin.ModelAdmin):
 @admin.register(MarkdownArticle)
 class MarkdownArticleAdmin(admin.ModelAdmin):
     form = MarkdownArticleAdminForm
-    list_display = ['edit_link', 'title', 'created_by', 'collection', 'status', 'created_at', 'article_link']
+    list_display = ['id', 'edit_link', 'title', 'created_by', 'collection', 'status', 'created_at', 'article_link']
     list_filter = ['status', 'collection', 'created_at']
     search_fields = ['title', 'description', 'content']
     readonly_fields = ['generated_html', 'created_at', 'updated_at']

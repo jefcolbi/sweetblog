@@ -3,6 +3,7 @@
 
 {% block object-tools-items %}
     {% if has_add_permission %}
+        {{ block.super }}
         <li>
             <a href="{{ add_url }}" class="addlink">
                 {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }} Outside{% endblocktrans %}
