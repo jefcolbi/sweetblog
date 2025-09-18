@@ -74,11 +74,12 @@ class MarkdownArticleForm(ModelForm):
 
         if 'image' in self.cleaned_data:
             original_image: InMemoryUploadedFile = self.cleaned_data['image']
-            content = BytesIO(original_image.read())
-            thumbnail = InMemoryUploadedFile(file=content, field_name='thumbnail',
-                                             name=original_image.name, content_type=original_image.content_type,
-                                             size=original_image.size, charset=original_image.charset)
-            original_image.seek(0)
+            if isinstance(original_image, InMemoryUploadedFile):
+                content = BytesIO(original_image.read())
+                thumbnail = InMemoryUploadedFile(file=content, field_name='thumbnail',
+                                                 name=original_image.name, content_type=original_image.content_type,
+                                                 size=original_image.size, charset=original_image.charset)
+                original_image.seek(0)
 
         res = super().save(commit=commit)
         if thumbnail:
