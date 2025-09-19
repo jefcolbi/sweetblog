@@ -19,23 +19,32 @@ class DeviceMiddleware(MiddlewareMixin):
             return None
         
         # Check for existing device_uuid cookie
-        device_uuid = request.COOKIES.get('device_uuid')
+        print(f"{request.COOKIES = }")
+        device_uuids = [
+            request.COOKIES.get('sb_fallback_device_uuid'),
+            request.COOKIES.get('device_uuid')
+        ]
 
-        if device_uuid:
-            try:
-                # Try to fetch existing device
-                device = Device.objects.get(uuid=device_uuid)
-                if request.user.is_authenticated and device.user != request.user:
-                    device.user = request.user
-                    device.save()
-                elif device.user:
-                    request.user = device.user
+        for device_uuid in device_uuids:
+            print(f"{device_uuid = }")
 
-                request.device = device
-            except (Device.DoesNotExist, ValueError):
-                # Create new device if not found or invalid UUID
-                device = Device.from_request(request)
-                request.device = device
+            if device_uuid:
+                try:
+                    # Try to fetch existing device
+                    device = Device.objects.get(uuid=device_uuid)
+                    print(f"{device = }")
+                    if request.user.is_authenticated and device.user != request.user:
+                        device.user = request.user
+                        device.save()
+                    elif device.user:
+                        request.user = device.user
+
+                    print(f"{request.user = }")
+                    request.device = device
+                    break
+                except (Device.DoesNotExist, ValueError):
+                    # Create new device if not found or invalid UUID
+                    pass
         else:
             # No cookie found, create new device
             device = Device.from_request(request)

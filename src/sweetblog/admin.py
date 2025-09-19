@@ -6,7 +6,8 @@ from django.contrib import messages
 from treenode.admin import TreeNodeModelAdmin
 from treenode.forms import TreeNodeForm
 
-from .models import Category, Collection, MarkdownArticle, MarkdownPage, ArticleRead, TempCode, Comment
+from .models import (Category, Collection, MarkdownArticle, MarkdownPage,
+                     ArticleRead, TempCode, Comment, Device)
 from .widgets import MarkdownWidget
 from .utils import send_newsletter_emails
 
@@ -216,3 +217,8 @@ class CommentAdmin(TreeNodeModelAdmin):
     treenode_display_mode = TreeNodeModelAdmin.TREENODE_DISPLAY_MODE_BREADCRUMBS
     ordering = ("created_at",)
     # form = TreeNodeForm
+
+
+@admin.register(Device)
+class DeviceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'uuid', 'path')

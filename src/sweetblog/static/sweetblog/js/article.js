@@ -87,10 +87,10 @@
 
         // Update counts if provided
         if (likeCount !== undefined) {
-            likeCountSpan.textContent = '(' + likeCount + ')';
+            likeCountSpan.textContent = likeCount;
         }
         if (dislikeCount !== undefined) {
-            dislikeCountSpan.textContent = '(' + dislikeCount + ')';
+            dislikeCountSpan.textContent = dislikeCount;
         }
     }
 

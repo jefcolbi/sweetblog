@@ -37,14 +37,14 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="{% if liked %}gold{% else %}none{% endif %}" stroke="{% if liked %}gold{% else %}currentColor{% endif %}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
             </svg>
-            <span>{{ like_count }} Likes</span>
+            <span><span id="like-count">{{ like_count }}</span> Likes</span>
         </button>
         
         <button id="dislike-btn" class="like-dislike-btn" data-action="dislike" style="background: grey; border: 1px solid #ccc; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="{% if disliked %}red{% else %}none{% endif %}" stroke="{% if disliked %}red{% else %}currentColor{% endif %}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
             </svg>
-            <span>{{ dislike_count }} Dislikes</span>
+            <span><span id="dislike-count">{{ dislike_count }}</span> Dislikes</span>
         </button>
     </div>
     

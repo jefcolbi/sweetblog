@@ -313,7 +313,7 @@ class Device(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.method} {self.path} from {self.remote_addr or 'unknown'}"
+        return f"{self.uuid} from {self.remote_addr or 'unknown'}"
 
     @classmethod
     def from_request(cls, request):
