@@ -341,6 +341,21 @@ class Device(models.Model):
             query_params=request.GET.dict() if request.GET else None,
         )
 
+    @classmethod
+    def for_bot(cls):
+        """
+        Create a Device instance from a Django HttpRequest object.
+        """
+
+        try:
+            return cls.objects.get(path="bot")
+        except Exception as e:
+            return cls.objects.create(
+                method="bot",
+                path="/",
+                full_path="/",
+            )
+
 
 class TempCode(models.Model):
     """Model for storing temporary authentication codes."""
