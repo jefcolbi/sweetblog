@@ -407,9 +407,9 @@ class MarkdownArticleFormView(BlogSettingsMixin):
             return reverse('admin:sweetblog_markdownarticle_changelist')
         elif action == 'save_continue':
             if self.is_new:
-                return reverse('article_add')
+                return reverse('sweetblog-article_add')
             else:
-                return reverse('article_edit', kwargs={"aid":self.object.get_hex_id()})
+                return reverse('sweetblog-article_edit', kwargs={"aid":self.object.get_hex_id()})
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -448,8 +448,9 @@ class TagAutocomplete(autocomplete.Select2QuerySetView):
 
 def get_device_id(request):
     """Generate a unique device ID based on request information."""
-    user_agent = request.META.get('HTTP_USER_AGENT', '')
-    remote_addr = request.META.get('REMOTE_ADDR', '')
+    meta = getattr(request, 'META', {}) or {}
+    user_agent = meta.get('HTTP_USER_AGENT', '')
+    remote_addr = meta.get('REMOTE_ADDR') or '127.0.0.1'
     
     # Create a hash of user agent and IP address
     device_string = f"{user_agent}:{remote_addr}"
@@ -481,6 +482,12 @@ class ConnectionView(BlogSettingsMixin, FormView):
         try:
             user = User.objects.get(email=email)
             profile, created = SweetblogProfile.objects.get_or_create(user=user)
+
+            if profile.is_device_linked(device_id):
+                user.backend = 'django.contrib.auth.backends.ModelBackend'
+                login(self.request, user)
+                next_url = self.request.GET.get('next', '/')
+                return redirect(next_url)
 
             if self.request.device.user == user:
                 next_url = self.request.GET.get('next', '/')
@@ -608,6 +615,7 @@ class CodeView(BlogSettingsMixin, FormView):
             # Get user and link device
             user = User.objects.get(email=email)
             profile = user.sweetblog_profile
+            profile.link_device(device_id)
 
             # Log the user in
             user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -684,9 +692,9 @@ class MarkdownPageFormView(BlogSettingsMixin):
             return reverse('admin:sweetblog_markdownpage_changelist')
         elif action == 'save_continue':
             if self.is_new:
-                return reverse('page_add')
+                return reverse('sweetblog-page_add')
             else:
-                return reverse('page_edit', kwargs={"canonical_title": self.object.normalized_title})
+                return reverse('sweetblog-page_edit', kwargs={"canonical_title": self.object.normalized_title})
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

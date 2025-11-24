@@ -21,19 +21,19 @@
         <header>
             <nav>
                 <ul>
-                    <h2><strong><a href="{% url 'home' %}">{{ blog_name }}</a></strong></h2>
+                    <h2><strong><a href="{% url 'sweetblog-home' %}">{{ blog_name }}</a></strong></h2>
                 </ul>
             </nav>
             <nav>
                 <ul>
-                    <li><a href="{% url 'collection_list' %}">{% translate 'Collections' %}</a></li>
+                    <li><a href="{% url 'sweetblog-collection_list' %}">{% translate 'Collections' %}</a></li>
                 </ul>
                 <ul>
-                    <li><a href="{% url 'tag_list' %}">{% translate 'Tags' %}</a></li>
+                    <li><a href="{% url 'sweetblog-tag_list' %}">{% translate 'Tags' %}</a></li>
                 </ul>
                 <ul>
                     <li>
-                        <form method="get" action="{% url 'search' %}" style="margin: 0;">
+                        <form method="get" action="{% url 'sweetblog-search' %}" style="margin: 0;">
                             <input type="search" name="q" placeholder="{% translate 'Search...' %}" style="margin: 0; height: auto;" required>
                         </form>
                     </li>

@@ -10,7 +10,7 @@
 <div class="tags-grid">
     {% for tag in tags %}
     <article class="tag-card">
-        <h4><a href="{% url 'tag_detail' slug=tag.slug %}">{{ tag.name }}</a></h4>
+        <h4><a href="{% url 'sweetblog-tag_detail' slug=tag.slug %}">{{ tag.name }}</a></h4>
         <p>
             <small>{{ tag.article_count }} article{{ tag.article_count|pluralize }}</small>
         </p>

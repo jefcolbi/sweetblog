@@ -39,7 +39,7 @@ class MarkdownWidget(forms.Textarea):
         textarea_html = super().render(name, value, attrs, renderer)
         
         # Get the API URL and CSS file
-        api_url = reverse('mistune_api')
+        api_url = reverse('sweetblog-mistune_api')
         github_css_url = static('sweetblog/github/github-markdown.css')
         
         html = f'''

@@ -44,7 +44,7 @@ class MarkdownArticleAdmin(admin.ModelAdmin):
     list_filter = ['status', 'collection', 'created_at']
     search_fields = ['title', 'description', 'content']
     readonly_fields = ['generated_html', 'created_at', 'updated_at']
-    filter_horizontal = ['tags']
+    filter_horizontal = []
     ordering = ['-created_at']
     
     fieldsets = (
@@ -74,7 +74,7 @@ class MarkdownArticleAdmin(admin.ModelAdmin):
     
     def edit_link(self, obj):
         if obj.id:
-            url = reverse('article_edit', kwargs={'aid': obj.get_hex_id()})
+            url = reverse('sweetblog-article_edit', kwargs={'aid': obj.get_hex_id()})
             return format_html(
                 '<a href="{}" target="_blank" title="Edit in external editor">✏️ Edit</a>',
                 url
@@ -99,7 +99,7 @@ class MarkdownArticleAdmin(admin.ModelAdmin):
     
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        extra_context['add_url'] = reverse('article_add')
+        extra_context['add_url'] = reverse('sweetblog-article_add')
         return super().changelist_view(request, extra_context=extra_context)
     
     actions = ['send_newsletter_with_selected_articles']
@@ -198,7 +198,7 @@ class MarkdownPageAdmin(admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        extra_context['add_url'] = reverse('page_add')
+        extra_context['add_url'] = reverse('sweetblog-page_add')
         return super().changelist_view(request, extra_context=extra_context)
 
 

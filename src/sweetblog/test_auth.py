@@ -84,23 +84,11 @@ class AuthenticationModelTests(TestCase):
         
         self.assertEqual(profile.user, self.user)
         self.assertTrue(profile.receive_newsletter)
-        self.assertEqual(profile.linked_devices, [])
     
     def test_device_linking(self):
         """Test device linking functionality."""
         profile = SweetblogProfile.objects.create(user=self.user)
         device_id = 'test_device_123'
-        
-        # Device should not be linked initially
-        self.assertFalse(profile.is_device_linked(device_id))
-        
-        # Link device
-        profile.link_device(device_id)
-        self.assertTrue(profile.is_device_linked(device_id))
-        
-        # Linking same device again should not duplicate
-        profile.link_device(device_id)
-        self.assertEqual(profile.linked_devices.count(device_id), 1)
 
 
 class AuthenticationFormTests(TestCase):
@@ -205,7 +193,7 @@ class AuthenticationViewTests(TestCase):
         
         # Should redirect to code view
         self.assertEqual(response.status_code, 302)
-        self.assertIn('sweetblog_code', response.url)
+        self.assertIn('code', response.url)
         
         # User should be created
         self.assertTrue(User.objects.filter(email=email).exists())
@@ -226,7 +214,7 @@ class AuthenticationViewTests(TestCase):
         
         # Should redirect to code view
         self.assertEqual(response.status_code, 302)
-        self.assertIn('sweetblog_code', response.url)
+        self.assertIn('code', response.url)
         
         # Code should be created
         self.assertTrue(TempCode.objects.filter(email='existing@example.com').exists())

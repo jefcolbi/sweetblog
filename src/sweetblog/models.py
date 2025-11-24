@@ -1,4 +1,5 @@
-from uuid import uuid4
+from uuid import uuid4, UUID
+import hashlib
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -59,7 +60,7 @@ class Category(TrackingMixin, TagBase):
         return self.name
 
     def get_url(self):
-        return reverse('tag_detail', kwargs={'slug':self.slug})
+        return reverse('sweetblog-tag_detail', kwargs={'slug':self.slug})
 
     def save(self, *args, **kwargs):
         self.name = self.name.title()
@@ -121,7 +122,7 @@ class Collection(ModelMeta, TrackingMixin, models.Model):
         return self.thumbnail.url
 
     def get_url(self):
-        return reverse('collection_detail', kwargs={'name':self.normalized_name})
+        return reverse('sweetblog-collection_detail', kwargs={'name':self.normalized_name})
 
     def get_keywords(self):
         author = getattr(settings, "BLOG_AUTHOR", "admin")
@@ -175,7 +176,7 @@ class AbstractArticle(ModelMeta, TrackingMixin, models.Model):
     def get_url(self):
         norm_title = unidecode(self.title)
         norm_title = rgx_normalize.sub("-", norm_title)
-        art_url = reverse('article_detail', kwargs={'title':norm_title.lower(),
+        art_url = reverse('sweetblog-article_detail', kwargs={'title':norm_title.lower(),
                                                     'type': 'md', 'aid': to_hex(self.id)})
         print(f"article url {art_url}")
         return BASE_URL + art_url
@@ -257,7 +258,7 @@ class AbstractPage(ModelMeta, TrackingMixin, models.Model):
     def get_url(self):
         norm_title = unidecode(self.title)
         norm_title = rgx_normalize.sub("-", norm_title)
-        art_url = reverse('page_detail', kwargs={'title':norm_title.lower(),
+        art_url = reverse('sweetblog-page_detail', kwargs={'title':norm_title.lower(),
                                                     'type': 'md', 'aid': to_hex(self.id)})
         print(f"article url {art_url}")
         return BASE_URL + art_url
@@ -410,16 +411,43 @@ class SweetblogProfile(models.Model):
     
     def __str__(self):
         return f"Profile for {self.user.email}"
-    
-    def is_device_linked(self, device_id):
-        """Check if a device is linked to this profile."""
-        return device_id in self.linked_devices
-    
-    def link_device(self, device_id):
-        """Link a device to this profile."""
-        if device_id and device_id not in self.linked_devices:
-            self.linked_devices.append(device_id)
-            self.save()
+
+    @staticmethod
+    def _normalize_device_uuid(device_id: str) -> UUID:
+        """
+        Convert a device identifier to a UUID instance.
+        Accepts UUID strings with or without dashes or a 32-hex digest.
+        """
+        try:
+            return UUID(str(device_id))
+        except (ValueError, AttributeError, TypeError):
+            # If device_id is not UUID-compatible, derive a deterministic UUID from it
+            digest = hashlib.sha256(str(device_id).encode()).hexdigest()[:32]
+            return UUID(hex=digest)
+
+    def link_device(self, device_id: str):
+        """Associate a device identifier with this user's devices."""
+        device_uuid = self._normalize_device_uuid(device_id)
+        device, created = Device.objects.get_or_create(
+            uuid=device_uuid,
+            defaults={
+                'method': 'LINK',
+                'path': '/',
+                'full_path': '/',
+            }
+        )
+        if device.user != self.user:
+            device.user = self.user
+            device.save(update_fields=['user'])
+        return device
+
+    def is_device_linked(self, device_id: str) -> bool:
+        """Check whether the given device identifier is linked to the user."""
+        try:
+            device_uuid = self._normalize_device_uuid(device_id)
+        except (ValueError, AttributeError, TypeError):
+            return False
+        return self.user.devices.filter(uuid=device_uuid).exists()
 
 
 class ArticleRead(models.Model):

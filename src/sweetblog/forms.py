@@ -110,8 +110,9 @@ class CodeForm(forms.Form):
             'readonly': True
         })
     )
-    code = forms.CharField(
+    code = forms.RegexField(
         label='Verification Code',
+        regex=r'^\d{6}$',
         max_length=6,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -120,6 +121,9 @@ class CodeForm(forms.Form):
             'maxlength': '6',
             'pattern': '[0-9]{6}'
         }),
+        error_messages={
+            'invalid': 'Enter a valid 6-digit code.'
+        },
         help_text='Enter the 6-digit code sent to your email'
     )
 
@@ -128,6 +132,7 @@ class ProfileForm(forms.ModelForm):
     """Form for user profile."""
     email = forms.EmailField(
         label='Email',
+        required=False,
         widget=forms.EmailInput(attrs={
             'class': 'form-control',
             'readonly': True

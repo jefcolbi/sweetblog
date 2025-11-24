@@ -17,12 +17,12 @@
     <div class="container">
         <header>
             <nav>
-                <h2><a href="{% url 'home' %}" style="text-decoration: none;">{{ blog_name }}</a></h2>
+                <h2><a href="{% url 'sweetblog-home' %}" style="text-decoration: none;">{{ blog_name }}</a></h2>
                 <ul>
-                    <li style="display: inline; margin-right: 20px;"><a href="{% url 'collection_list' %}">{% translate 'Collections' %}</a></li>
-                    <li style="display: inline; margin-right: 20px;"><a href="{% url 'tag_list' %}">{% translate 'Tags' %}</a></li>
+                    <li style="display: inline; margin-right: 20px;"><a href="{% url 'sweetblog-collection_list' %}">{% translate 'Collections' %}</a></li>
+                    <li style="display: inline; margin-right: 20px;"><a href="{% url 'sweetblog-tag_list' %}">{% translate 'Tags' %}</a></li>
                     <li style="display: inline;">
-                        <form method="get" action="{% url 'search' %}" style="display: inline;">
+                        <form method="get" action="{% url 'sweetblog-search' %}" style="display: inline;">
                             <input type="search" name="q" placeholder="{% translate 'Search...' %}" style="width: 200px;" required>
                             <button type="submit">{% translate 'Search' %}</button>
                         </form>

@@ -52,7 +52,7 @@
     <footer>
         <p>Tags:
         {% for tag in article.tags.all %}
-        <a href="{% url 'tag_detail' slug=tag.slug %}" class="tag">{{ tag.name }}</a>
+        <a href="{% url 'sweetblog-tag_detail' slug=tag.slug %}" class="tag">{{ tag.name }}</a>
         {% endfor %}
         </p>
     </footer>
@@ -188,9 +188,9 @@
     window.articleId = {{ article.id }};
     window.articleType = 'markdownarticle';
     window.csrfToken = '{{ csrf_token }}';
-    window.likeDislikeUrl = "{% url 'like_dislike' %}";
-    window.markAsReadUrl = "{% url 'mark_as_read' %}";
-    window.submitCommentUrl = "{% url 'submit_comment' %}";
+    window.likeDislikeUrl = "{% url 'sweetblog-like_dislike' %}";
+    window.markAsReadUrl = "{% url 'sweetblog-mark_as_read' %}";
+    window.submitCommentUrl = "{% url 'sweetblog-submit_comment' %}";
 </script>
 <script src="{% static 'sweetblog/js/article.js' %}"></script>
 {% endblock %}

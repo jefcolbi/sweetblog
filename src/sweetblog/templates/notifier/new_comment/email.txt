@@ -1,0 +1,26 @@
+{{ blog_name }}
+========================
+
+New Comment
+
+Hello{% if user %} {{ user.first_name|default:user.username }}{% endif %}!
+
+We received a request to verify your email address for {{ blog_name }}.
+Please use the verification code below to complete your authentication:
+
+YOUR VERIFICATION CODE:
+-----------------------
+{{ code }}
+-----------------------
+
+This code will expire in 10 minutes for security reasons.
+
+If you didn't request this verification, please ignore this email.
+Your account remains secure.
+
+SECURITY TIP: Never share your verification code with anyone.
+{{ blog_name }} staff will never ask for your code.
+
+---
+© {{ current_year }} {{ blog_name }}. All rights reserved.
+This is an automated message, please do not reply to this email.
