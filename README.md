@@ -239,10 +239,8 @@ python manage.py runserver
 - **Collection**: Groups of related articles
 - **Article**: Base article model
 - **MarkdownArticle**: Article with Markdown content
-- **Tag**: Article tags
 - **Device**: User device tracking
 - **Comment**: Article comments
-- **ArticleStats**: View and engagement statistics
 
 ## Admin Features
 
